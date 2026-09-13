@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ✨ Charticles
+
+**Charts made of light.**
+
+Charticles turns plain data into animated, glowing particle charts — instead of another flat bar graph nobody stops to look at, get bar, line, pie, donut, radar, and bubble charts rendered as living clouds of warm, drifting particles. Export them as MP4, GIF, or PNG for social content, pitch decks, or reports.
+
+Free to use.
+
+---
+
+## Features
+
+- **6 chart types** — Bar, Line, Pie, Donut, Radar, Bubble
+- **Dual-series comparisons** — toggle on a second series (e.g. "This year vs Last year") with its own legend and colors
+- **Two ways to add data** — type it in manually, or upload a CSV
+- **Live particle preview** — see your chart animate in real time as you tweak colors, density, and style
+- **Warm, distinctive aesthetic** — amber/coral/gold particle palettes on a dark or light theme, with a one-click theme toggle
+- **Export anywhere** — download as MP4, animated GIF, or a high-res PNG snapshot
+- **Aspect ratio presets** — 9:16, 1:1, and 16:9, sized correctly for Reels/Stories, Instagram feed, and landscape/decks
+
+## Who it's for
+
+- Social media managers and content creators who want a chart that stops the scroll
+- Founders and small teams building a standout metric slide for a pitch deck
+- Newsletter writers who want a distinct, recognizable visual style
+- Small marketing and design agencies producing client deliverables
+
+## Tech Stack
+
+- **Framework:** Next.js (App Router)
+- **Styling:** Tailwind CSS + shadcn/ui
+- **Rendering engine:** [particle-charts](https://github.com/bwilliford/particleCharts) — an MIT-licensed particle chart rendering library
+- **Auth & data:** Supabase
+- **Theming:** next-themes
 
 ## Getting Started
 
-First, run the development server:
+```bash
+git clone https://github.com/<your-username>/charticles.git
+cd charticles
+npm install
+```
+
+Create a `.env.local` file from the provided example and add your Supabase credentials:
+
+```bash
+cp .env.local.example .env.local
+```
+
+Then run the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view it.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+charticles/
+├── app/                # Routes (landing page, dashboard, auth)
+├── components/
+│   ├── charts/          # Particle chart rendering + overlay (axes, legend, tooltips)
+│   ├── dashboard/        # Data input, style controls, export panel
+│   └── landing/          # Landing page sections
+├── lib/                 # Types, palettes, Supabase client/server setup
+└── public/
+```
 
-## Learn More
+## Credits
 
-To learn more about Next.js, take a look at the following resources:
+Charticles' particle rendering is built on top of [particle-charts](https://github.com/bwilliford/particleCharts) by Blake Williford, used under the MIT License.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
