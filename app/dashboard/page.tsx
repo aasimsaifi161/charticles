@@ -38,6 +38,7 @@ import { ImageChartUploader } from "@/components/dashboard/ImageChartUploader";
 import { PlaygroundKnobs } from "@/components/dashboard/PlaygroundKnobs";
 import { ParticleChartStage } from "@/components/ParticleChartStage";
 import { ExportStudioModal } from "@/components/dashboard/ExportStudioModal";
+import type { PresetTemplate } from "@/lib/preset-templates";
 import {
   computeCategoryBottomPadding,
   shouldTiltCategoryLabels,
@@ -208,6 +209,12 @@ export default function DashboardPage() {
       showGrid: knobs.showGrid,
       showLegend: knobs.showLegend,
       showValues: knobs.showValues,
+      legend: {
+        position: "bottom" as const,
+        align: "center" as const,
+        fontSize: effectiveLegendFontSize,
+        markerSize: effectiveLegendMarkerSize,
+      },
     };
 
     switch (activeChartType) {
@@ -382,6 +389,12 @@ export default function DashboardPage() {
     setParticleCount(null);
   };
 
+  const handleSelectPreset = (preset: PresetTemplate) => {
+    setDatasetName(preset.name);
+    setTabularData(preset.data);
+    setActiveChartType(preset.chartType);
+  };
+
   return (
     <div className="flex h-screen w-screen flex-col bg-black text-[#eef1f6] antialiased overflow-hidden selection:bg-[#2ff0d6]/30 selection:text-[#2ff0d6]">
       {/* Top Figma App Header */}
@@ -394,6 +407,7 @@ export default function DashboardPage() {
         onChartTypeChange={setActiveChartType}
         chartTypes={CHART_TYPES}
         onOpenExport={() => setIsExportModalOpen(true)}
+        onSelectPreset={handleSelectPreset}
       />
 
       {/* Main 3-Column Studio Workspace */}
@@ -493,11 +507,11 @@ export default function DashboardPage() {
             }}
           />
 
-          {/* Floating Graph Title: Interactive & Inline-Editable */}
-          <div className="absolute top-4 left-6 z-30 flex items-center gap-2 max-w-[60%] select-none">
+          {/* Floating Graph Title: Centered at Top Middle & Small */}
+          <div className="absolute top-3.5 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center max-w-[80%] select-none">
             {isEditingTitle ? (
-              <div className="flex items-center gap-2 bg-black/85 border border-[#2ff0d6]/60 rounded-xl px-3 py-1.5 backdrop-blur-md shadow-lg shadow-[#2ff0d6]/10">
-                <Sparkles className="h-3.5 w-3.5 text-[#2ff0d6] shrink-0 animate-pulse" />
+              <div className="flex items-center gap-2 bg-black/90 border border-[#2ff0d6]/60 rounded-full px-3 py-1 backdrop-blur-md shadow-lg shadow-[#2ff0d6]/10">
+                <Sparkles className="h-3 w-3 text-[#2ff0d6] shrink-0 animate-pulse" />
                 <input
                   autoFocus
                   type="text"
@@ -511,7 +525,7 @@ export default function DashboardPage() {
                       setIsEditingTitle(false);
                     }
                   }}
-                  className="bg-transparent text-sm font-semibold text-white outline-none w-48 sm:w-64 placeholder-[#555E6D]"
+                  className="bg-transparent text-xs font-medium text-white outline-none w-40 sm:w-56 text-center placeholder-[#555E6D]"
                   placeholder="Name this graph..."
                 />
               </div>
@@ -519,14 +533,14 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setIsEditingTitle(true)}
-                className="group flex items-center gap-2.5 bg-black/40 hover:bg-black/70 border border-white/10 hover:border-[#2ff0d6]/40 rounded-xl px-3.5 py-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md text-left"
+                className="group flex items-center gap-1.5 bg-black/60 hover:bg-black/85 border border-white/10 hover:border-[#2ff0d6]/40 rounded-full px-3 py-1 backdrop-blur-md transition-all cursor-pointer shadow-md text-center"
                 title="Click to rename graph"
               >
-                <div className="h-2 w-2 rounded-full bg-[#2ff0d6] shadow-sm shadow-[#2ff0d6]/50 animate-pulse shrink-0" />
-                <span className="text-sm font-semibold tracking-tight text-white group-hover:text-[#2ff0d6] transition-colors truncate max-w-[220px] sm:max-w-[340px]">
+                <div className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6] shadow-sm shadow-[#2ff0d6]/50 animate-pulse shrink-0" />
+                <span className="text-xs font-medium text-white/90 group-hover:text-[#2ff0d6] transition-colors truncate max-w-[180px] sm:max-w-[300px]">
                   {datasetName}
                 </span>
-                <Pencil className="h-3 w-3 text-[#8E97A8] opacity-0 group-hover:opacity-100 group-hover:text-[#2ff0d6] transition-all ml-0.5 shrink-0" />
+                <Pencil className="h-2.5 w-2.5 text-[#8E97A8] opacity-0 group-hover:opacity-100 group-hover:text-[#2ff0d6] transition-all ml-0.5 shrink-0" />
               </button>
             )}
           </div>

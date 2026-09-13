@@ -13,9 +13,43 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Particle Charts Studio — Interactive Data Visualizer",
+  title: "Charticles — Free 60 FPS Particle Chart Studio",
   description:
-    "High-performance particle chart playground and data studio powered by particle-charts.",
+    "Turn any data or chart image into mesmerizing, living particle visualizations. Export Ultra HD PNGs and 60 FPS video loops for pitch decks and social media. 100% free, zero watermarks.",
+  keywords: [
+    "particle charts",
+    "data visualization",
+    "chart maker",
+    "60fps chart video",
+    "pitch deck visualizer",
+    "canva alternative for charts",
+    "ray.so for charts",
+    "free chart export",
+  ],
+  authors: [{ name: "Aasim Saifi", url: "https://x.com/aasimtwt" }],
+  creator: "Aasim Saifi (@aasimtwt)",
+  publisher: "Charticles",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://charticles.com",
+    title: "Charticles — Free 60 FPS Particle Chart Studio",
+    description:
+      "Turn any data or chart image into mesmerizing, living particle visualizations. 100% free, zero watermarks.",
+    siteName: "Charticles",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Charticles — Free 60 FPS Particle Chart Studio",
+    description:
+      "Turn any data or chart image into mesmerizing, living particle visualizations. 100% free, zero watermarks.",
+    creator: "@aasimtwt",
+  },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

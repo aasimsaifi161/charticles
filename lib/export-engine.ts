@@ -4,8 +4,7 @@
  * Provides studio-grade exports:
  * 1. Ultra HD PNGs (1x, 2x Retina, 4K UHD) with Transparent or Deep Black backgrounds
  *    and optional Canva/Ray.so-style Studio Card framing.
- * 2. 60 FPS native GPU canvas video loop recording (WebM/MP4) with high bitrate.
- * 3. Copyable React & Vanilla JS embed code snippets.
+ * 2. 60 FPS video loop recording with composited top-middle title and bottom series legend.
  */
 
 export interface ExportImageOptions {
@@ -24,6 +23,83 @@ export interface RecordVideoOptions {
   onProgress?: (progressPercent: number) => void;
 }
 
+interface LegendEntry {
+  color: string;
+  label: string;
+}
+
+/**
+ * Extract active series legend items from the DOM preview.
+ */
+function getActiveLegendEntries(): LegendEntry[] {
+  if (typeof document === "undefined") return [];
+  const items = document.querySelectorAll<HTMLElement>(".pchart-legend-item");
+  const entries: LegendEntry[] = [];
+  items.forEach((item) => {
+    const marker = item.querySelector<HTMLElement>(".pchart-legend-marker");
+    const label = item.querySelector<HTMLElement>(".pchart-legend-label");
+    const color = marker?.style.backgroundColor || marker?.style.background || "#2ff0d6";
+    const text = label?.textContent || "";
+    if (text.trim()) {
+      entries.push({ color, label: text.trim() });
+    }
+  });
+  return entries;
+}
+
+/**
+ * Draw series legend items centered horizontally on canvas.
+ */
+function drawLegendOnCanvas(
+  ctx: CanvasRenderingContext2D,
+  entries: LegendEntry[],
+  centerX: number,
+  bottomY: number,
+  scale: number
+) {
+  if (!entries || entries.length === 0) return;
+
+  ctx.save();
+  const fontSize = Math.max(10, Math.round(11 * scale));
+  ctx.font = `500 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+  ctx.textBaseline = "middle";
+
+  const markerRadius = Math.max(3, Math.round(4 * scale));
+  const markerTextGap = Math.round(6 * scale);
+  const itemGap = Math.round(20 * scale);
+
+  // Measure total width to center the entire legend
+  let totalWidth = 0;
+  const itemWidths = entries.map((e) => {
+    const w = markerRadius * 2 + markerTextGap + ctx.measureText(e.label).width;
+    totalWidth += w;
+    return w;
+  });
+  totalWidth += (entries.length - 1) * itemGap;
+
+  let startX = centerX - totalWidth / 2;
+
+  entries.forEach((entry, i) => {
+    // Draw colored marker dot
+    ctx.beginPath();
+    ctx.arc(startX + markerRadius, bottomY, markerRadius, 0, Math.PI * 2);
+    ctx.fillStyle = entry.color;
+    ctx.shadowColor = entry.color;
+    ctx.shadowBlur = Math.round(5 * scale);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Draw label
+    ctx.fillStyle = "rgba(238, 241, 246, 0.85)";
+    ctx.textAlign = "left";
+    ctx.fillText(entry.label, startX + markerRadius * 2 + markerTextGap, bottomY);
+
+    startX += itemWidths[i] + itemGap;
+  });
+
+  ctx.restore();
+}
+
 /**
  * Trigger browser file download from a Blob.
  */
@@ -39,7 +115,7 @@ export function downloadBlob(blob: Blob, filename: string) {
 }
 
 /**
- * Export crystal-clear, high-DPI PNG image.
+ * Export crystal-clear, high-DPI PNG image with top-middle small title and bottom series legend.
  */
 export async function exportChartPng(options: ExportImageOptions): Promise<void> {
   const {
@@ -60,16 +136,18 @@ export async function exportChartPng(options: ExportImageOptions): Promise<void>
 
   const srcW = canvas.width;
   const srcH = canvas.height;
+  const legendEntries = getActiveLegendEntries();
+  const hasLegend = legendEntries.length > 0;
 
   if (studioFrame) {
-    // Studio Card Frame (Canva / Ray.so presentation style)
+    // Studio Card Frame with top-middle small title and bottom legend
     const cardPaddingX = Math.round(50 * scale);
-    const cardHeaderHeight = Math.round(60 * scale);
-    const cardBottomPadding = Math.round(36 * scale);
+    const cardHeaderHeight = Math.round(54 * scale);
+    const cardBottomPadding = Math.round((hasLegend ? 52 : 36) * scale);
     const outerMargin = Math.round(44 * scale);
 
-    const cardW = srcW * (scale > 1 ? 1 : 1) + cardPaddingX * 2;
-    const cardH = srcH * (scale > 1 ? 1 : 1) + cardHeaderHeight + cardBottomPadding;
+    const cardW = srcW + cardPaddingX * 2;
+    const cardH = srcH + cardHeaderHeight + cardBottomPadding;
 
     const outW = cardW + outerMargin * 2;
     const outH = cardH + outerMargin * 2;
@@ -116,51 +194,67 @@ export async function exportChartPng(options: ExportImageOptions): Promise<void>
     ctx.stroke();
     ctx.clip();
 
-    // Card Header
-    const headerY = cardY + Math.round(36 * scale);
-    const headerLeft = cardX + cardPaddingX;
+    // Card Header: Top Middle Small Title
+    const titleText = title || "Particle Chart";
+    const headerY = cardY + Math.round(28 * scale);
+    const titleCenterX = cardX + cardW / 2;
 
-    // Pulse dot
+    ctx.font = `600 ${Math.round(13 * scale)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    // Small glowing teal indicator dot before title
+    const titleWidth = ctx.measureText(titleText).width;
+    const dotRadius = Math.max(2, Math.round(2.5 * scale));
+    const dotX = titleCenterX - titleWidth / 2 - Math.round(9 * scale);
+
     ctx.beginPath();
-    ctx.arc(headerLeft, headerY - Math.round(4 * scale), Math.round(5 * scale), 0, Math.PI * 2);
+    ctx.arc(dotX, headerY, dotRadius, 0, Math.PI * 2);
     ctx.fillStyle = "#2ff0d6";
     ctx.shadowColor = "rgba(47, 240, 214, 0.6)";
-    ctx.shadowBlur = 10 * scale;
+    ctx.shadowBlur = 6 * scale;
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // Title Text
-    ctx.font = `600 ${Math.round(18 * scale)}px -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif`;
-    ctx.fillStyle = "#ffffff";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-    ctx.fillText(title || "Particle Chart", headerLeft + Math.round(16 * scale), headerY - Math.round(4 * scale));
+    ctx.fillText(titleText, titleCenterX, headerY);
 
-    // Chart Type Badge
+    // Chart Type Badge on the right
     const badgeText = activeChartType.toUpperCase();
-    ctx.font = `600 ${Math.round(10 * scale)}px monospace`;
-    const badgeW = ctx.measureText(badgeText).width + Math.round(14 * scale);
-    const badgeH = Math.round(20 * scale);
+    ctx.font = `600 ${Math.round(9 * scale)}px monospace`;
+    const badgeW = ctx.measureText(badgeText).width + Math.round(12 * scale);
+    const badgeH = Math.round(18 * scale);
     const badgeX = cardX + cardW - cardPaddingX - badgeW;
-    const badgeY = headerY - Math.round(14 * scale);
+    const badgeY = headerY - badgeH / 2;
 
     ctx.beginPath();
-    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, Math.round(6 * scale));
-    ctx.fillStyle = "rgba(47, 240, 214, 0.12)";
+    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, Math.round(5 * scale));
+    ctx.fillStyle = "rgba(47, 240, 214, 0.1)";
     ctx.fill();
-    ctx.strokeStyle = "rgba(47, 240, 214, 0.35)";
+    ctx.strokeStyle = "rgba(47, 240, 214, 0.3)";
     ctx.lineWidth = 1;
     ctx.stroke();
 
     ctx.fillStyle = "#2ff0d6";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(badgeText, badgeX + badgeW / 2, badgeY + badgeH / 2);
+    ctx.fillText(badgeText, badgeX + badgeW / 2, headerY);
 
     // Draw chart canvas into card
     const chartTargetX = cardX + cardPaddingX;
     const chartTargetY = cardY + cardHeaderHeight;
     ctx.drawImage(canvas, chartTargetX, chartTargetY, srcW, srcH);
+
+    // Draw Legend below chart
+    if (hasLegend) {
+      drawLegendOnCanvas(
+        ctx,
+        legendEntries,
+        cardX + cardW / 2,
+        chartTargetY + srcH + Math.round(24 * scale),
+        scale
+      );
+    }
 
     ctx.restore();
 
@@ -174,9 +268,12 @@ export async function exportChartPng(options: ExportImageOptions): Promise<void>
       1.0
     );
   } else {
-    // Clean Canvas (Direct High-Resolution Snapshot)
-    const outW = srcW * (scale > 1 ? scale : 1);
-    const outH = srcH * (scale > 1 ? scale : 1);
+    // Clean Canvas Export (Without Card Frame)
+    const topMargin = Math.round(44 * scale);
+    const bottomMargin = Math.round((hasLegend ? 48 : 20) * scale);
+
+    const outW = srcW;
+    const outH = srcH + topMargin + bottomMargin;
 
     const offscreen = document.createElement("canvas");
     offscreen.width = outW;
@@ -189,9 +286,27 @@ export async function exportChartPng(options: ExportImageOptions): Promise<void>
       ctx.fillRect(0, 0, outW, outH);
     }
 
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(canvas, 0, 0, outW, outH);
+    // Top Middle Small Title
+    const titleText = title || "Particle Chart";
+    ctx.font = `600 ${Math.round(13 * scale)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(titleText, outW / 2, Math.round(22 * scale));
+
+    // Draw chart canvas
+    ctx.drawImage(canvas, 0, topMargin, srcW, srcH);
+
+    // Draw Legend below chart
+    if (hasLegend) {
+      drawLegendOnCanvas(
+        ctx,
+        legendEntries,
+        outW / 2,
+        topMargin + srcH + Math.round(22 * scale),
+        scale
+      );
+    }
 
     const sanitizedTitle = (title || "particle-chart").toLowerCase().replace(/[^a-z0-9]+/g, "-");
     offscreen.toBlob(
@@ -205,16 +320,35 @@ export async function exportChartPng(options: ExportImageOptions): Promise<void>
 }
 
 /**
- * Record a pristine, smooth 60 FPS video loop of the particle canvas using native GPU stream.
+ * Record a pristine, smooth 60 FPS video loop of the preview
+ * including the small top-middle title, live GPU particles, and series legend below the chart.
  */
 export async function recordCanvasVideo(options: RecordVideoOptions): Promise<void> {
   const { canvas, title, durationSeconds = 4, onProgress } = options;
 
   if (!canvas) throw new Error("Canvas element not found.");
 
+  const legendEntries = getActiveLegendEntries();
+  const hasLegend = legendEntries.length > 0;
+
+  // Composite canvas with extra headroom for top-middle small title and footer for series legend
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const srcW = canvas.width;
+  const srcH = canvas.height;
+
+  // Reserve top margin for title and bottom margin for legend
+  const topMargin = Math.round(40 * dpr);
+  const bottomMargin = Math.round((hasLegend ? 44 : 16) * dpr);
+
+  const compCanvas = document.createElement("canvas");
+  compCanvas.width = srcW;
+  compCanvas.height = srcH + topMargin + bottomMargin;
+  const compCtx = compCanvas.getContext("2d");
+  if (!compCtx) throw new Error("Could not create composite canvas context.");
+
   // Check captureStream support
   const captureStream =
-    (canvas as any).captureStream || (canvas as any).mozCaptureStream;
+    (compCanvas as any).captureStream || (compCanvas as any).mozCaptureStream;
   if (!captureStream) {
     throw new Error("Canvas video streaming is not supported in this browser.");
   }
@@ -228,7 +362,7 @@ export async function recordCanvasVideo(options: RecordVideoOptions): Promise<vo
     mimeType = "video/webm";
   }
 
-  const stream: MediaStream = captureStream.call(canvas, 60); // 60 FPS direct GPU hook
+  const stream: MediaStream = captureStream.call(compCanvas, 60); // 60 FPS direct GPU hook
   const recorder = new MediaRecorder(stream, {
     mimeType,
     videoBitsPerSecond: 14_000_000, // 14 Mbps high bitrate for lossless glow
@@ -245,6 +379,41 @@ export async function recordCanvasVideo(options: RecordVideoOptions): Promise<vo
   const startTime = Date.now();
 
   return new Promise((resolve, reject) => {
+    let animId: number;
+
+    // Continuous 60 FPS Compositing Loop: Paints live canvas + top-middle title + series legend
+    const renderLoop = () => {
+      // 1. Black background
+      compCtx.fillStyle = "#000000";
+      compCtx.fillRect(0, 0, compCanvas.width, compCanvas.height);
+
+      // 2. Small Top-Middle Title
+      const titleText = title || "Particle Chart";
+      compCtx.font = `600 ${Math.round(13 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      compCtx.fillStyle = "rgba(255, 255, 255, 0.9)";
+      compCtx.textAlign = "center";
+      compCtx.textBaseline = "middle";
+      compCtx.fillText(titleText, compCanvas.width / 2, Math.round(20 * dpr));
+
+      // 3. Live Canvas Particles
+      compCtx.drawImage(canvas, 0, topMargin, srcW, srcH);
+
+      // 4. Series Legend Below Chart
+      if (hasLegend) {
+        drawLegendOnCanvas(
+          compCtx,
+          legendEntries,
+          compCanvas.width / 2,
+          topMargin + srcH + Math.round(20 * dpr),
+          dpr
+        );
+      }
+
+      animId = requestAnimationFrame(renderLoop);
+    };
+
+    animId = requestAnimationFrame(renderLoop);
+
     const progressInterval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const pct = Math.min(100, Math.round((elapsed / totalMs) * 100));
@@ -252,6 +421,7 @@ export async function recordCanvasVideo(options: RecordVideoOptions): Promise<vo
     }, 50);
 
     recorder.onstop = () => {
+      cancelAnimationFrame(animId);
       clearInterval(progressInterval);
       onProgress?.(100);
 
@@ -262,6 +432,7 @@ export async function recordCanvasVideo(options: RecordVideoOptions): Promise<vo
     };
 
     recorder.onerror = (err) => {
+      cancelAnimationFrame(animId);
       clearInterval(progressInterval);
       reject(err);
     };
@@ -275,4 +446,3 @@ export async function recordCanvasVideo(options: RecordVideoOptions): Promise<vo
     }, totalMs);
   });
 }
-
