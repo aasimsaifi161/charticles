@@ -18,6 +18,7 @@ import {
 import { CharticlesLogo } from "@/components/icons/CharticlesLogo";
 import { ParticleChartStage } from "@/components/ParticleChartStage";
 import { ParticleBackground } from "@/components/landing/ParticleBackground";
+import { trackEvent } from "@/lib/analytics";
 import { OFFICIAL_PALETTE } from "@/lib/theme";
 import type { ChartOptions } from "particle-charts";
 
@@ -197,6 +198,7 @@ export default function LandingPage() {
 
           <Link
             href="/dashboard"
+            onClick={() => trackEvent("open_studio_clicked", { location: "nav" })}
             className="inline-flex items-center gap-1.5 rounded-lg bg-[#2ff0d6] px-3.5 py-1.5 text-xs font-semibold text-[#06070a] shadow-sm shadow-[#2ff0d6]/25 hover:bg-[#28d7bf] hover:shadow-[#2ff0d6]/35 active:scale-[0.98] transition-all"
           >
             <span>Open Studio</span>
@@ -246,6 +248,7 @@ export default function LandingPage() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/dashboard"
+                onClick={() => trackEvent("open_studio_clicked", { location: "hero" })}
                 className="inline-flex items-center gap-2 rounded-xl bg-[#2ff0d6] px-6 py-3 text-sm font-semibold text-[#06070a] shadow-lg shadow-[#2ff0d6]/25 hover:bg-[#28d7bf] hover:shadow-[#2ff0d6]/35 active:scale-[0.98] transition-all"
               >
                 <span>Open Studio — Free</span>
@@ -256,6 +259,7 @@ export default function LandingPage() {
                 href="https://github.com/aasimsaifi161/charticles"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("support_clicked", { location: "hero", target: "github" })}
                 className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-medium text-[#cad2e0] hover:text-white hover:bg-white/[0.07] hover:border-white/20 transition-all"
               >
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -500,6 +504,7 @@ export default function LandingPage() {
                 href="https://buymeacoffee.com/aasim161"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("support_clicked", { location: "creator_card", target: "coffee" })}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#FFDD00] px-4 py-2.5 text-xs font-semibold text-black shadow-md shadow-[#FFDD00]/15 hover:bg-[#ffea55] active:scale-[0.98] transition-all"
               >
                 <Coffee className="h-4 w-4" />
@@ -511,6 +516,7 @@ export default function LandingPage() {
                 href="https://github.com/aasimsaifi161"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("support_clicked", { location: "creator_card", target: "github" })}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-[#cad2e0] hover:text-white hover:bg-white/[0.08] transition-all"
               >
                 <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
@@ -528,6 +534,7 @@ export default function LandingPage() {
                 href="https://x.com/aasimtwt"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("support_clicked", { location: "creator_card", target: "twitter" })}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-[#cad2e0] hover:text-white hover:bg-white/[0.08] transition-all"
               >
                 <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
@@ -554,6 +561,7 @@ export default function LandingPage() {
           <div className="mt-6 flex items-center justify-center gap-3">
             <Link
               href="/dashboard"
+              onClick={() => trackEvent("open_studio_clicked", { location: "cta_banner" })}
               className="inline-flex items-center gap-2 rounded-xl bg-[#2ff0d6] px-6 py-3 text-xs sm:text-sm font-semibold text-[#06070a] shadow-lg shadow-[#2ff0d6]/25 hover:bg-[#28d7bf] active:scale-[0.98] transition-all"
             >
               <span>Launch Studio</span>
@@ -596,6 +604,7 @@ export default function LandingPage() {
             href="https://buymeacoffee.com/aasim161"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent("support_clicked", { location: "footer", target: "coffee" })}
             className="hover:text-white transition-colors inline-flex items-center gap-1 text-[#eef1f6]/90"
           >
             <Coffee className="h-3 w-3 text-[#FFDD00]" />

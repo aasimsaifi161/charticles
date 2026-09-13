@@ -14,6 +14,7 @@ import {
   exportChartPng,
   recordCanvasVideo,
 } from "@/lib/export-engine";
+import { trackEvent } from "@/lib/analytics";
 import type { ChartOptions } from "particle-charts";
 
 interface ExportStudioModalProps {
@@ -82,6 +83,12 @@ export function ExportStudioModal({
         studioFrame,
         activeChartType,
       });
+      trackEvent("chart_exported", {
+        format: "png",
+        resolution,
+        studioFrame,
+        chartType: activeChartType,
+      });
       setTimeout(() => {
         setIsProcessing(false);
         setStatusMessage(null);
@@ -113,6 +120,13 @@ export function ExportStudioModal({
         onProgress: (pct) => {
           setRecordingProgress(pct);
         },
+      });
+
+      trackEvent("chart_exported", {
+        format: "webm",
+        duration,
+        fps: 60,
+        chartType: activeChartType,
       });
 
       setIsProcessing(false);
@@ -308,6 +322,7 @@ export function ExportStudioModal({
             href="https://buymeacoffee.com/aasim161"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent("support_clicked", { location: "export_modal", target: "coffee" })}
             className="text-[#FFDD00] hover:text-[#ffea55] inline-flex items-center gap-1.5 font-medium transition-colors"
           >
             <Coffee className="h-3 w-3" />

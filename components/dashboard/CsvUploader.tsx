@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import { UploadCloud, CheckCircle2, AlertCircle, FileSpreadsheet } from "lucide-react";
 import { parseCsv } from "@/lib/csv-parser";
+import { trackEvent } from "@/lib/analytics";
 import type { TabularData } from "@/types/dashboard";
 
 interface CsvUploaderProps {
@@ -32,6 +33,10 @@ export function CsvUploader({ onDataParsed }: CsvUploaderProps) {
         if (result.error || !result.data) {
           setErrorMessage(result.error || "Failed to parse CSV file.");
         } else {
+          trackEvent("csv_imported", {
+            rows: result.data.rows.length,
+            columns: result.data.headers.length,
+          });
           onDataParsed(result.data, file.name);
         }
       }

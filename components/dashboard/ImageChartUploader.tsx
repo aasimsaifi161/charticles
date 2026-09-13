@@ -10,6 +10,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import type { ExtractedChartData } from "@/types/dashboard";
+import { trackEvent } from "@/lib/analytics";
 
 interface ImageChartUploaderProps {
   onChartExtracted: (data: ExtractedChartData) => void;
@@ -55,6 +56,10 @@ export function ImageChartUploader({ onChartExtracted }: ImageChartUploaderProps
         setSuccessMessage(
           `Extracted ${result.data.rows.length} data rows (${result.chartType.toUpperCase()})`
         );
+        trackEvent("vision_chart_generated", {
+          chartType: result.chartType,
+          rows: result.data.rows.length,
+        });
         onChartExtracted(result);
       } catch (err) {
         setErrorMessage(
