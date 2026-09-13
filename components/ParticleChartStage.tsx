@@ -81,8 +81,7 @@ export function ParticleChartStage({
       className={className}
       style={{
         width: "100%",
-        height: "520px",
-        minHeight: "500px",
+        height: "100%",
         ...style,
       }}
     />

@@ -423,6 +423,9 @@ export async function recordCanvasVideo(options: RecordVideoOptions): Promise<vo
     recorder.onstop = () => {
       cancelAnimationFrame(animId);
       clearInterval(progressInterval);
+      try {
+        stream.getTracks().forEach((track) => track.stop());
+      } catch {}
       onProgress?.(100);
 
       const videoBlob = new Blob(chunks, { type: mimeType });
@@ -434,6 +437,9 @@ export async function recordCanvasVideo(options: RecordVideoOptions): Promise<vo
     recorder.onerror = (err) => {
       cancelAnimationFrame(animId);
       clearInterval(progressInterval);
+      try {
+        stream.getTracks().forEach((track) => track.stop());
+      } catch {}
       reject(err);
     };
 

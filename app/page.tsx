@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { CharticlesLogo } from "@/components/icons/CharticlesLogo";
 import { ParticleChartStage } from "@/components/ParticleChartStage";
+import { ParticleBackground } from "@/components/landing/ParticleBackground";
 import { OFFICIAL_PALETTE } from "@/lib/theme";
 import type { ChartOptions } from "particle-charts";
 
@@ -159,7 +160,10 @@ export default function LandingPage() {
   const activeDemo = HERO_DEMOS[activeTab];
 
   return (
-    <div className="min-h-screen bg-black text-[#eef1f6] antialiased selection:bg-[#2ff0d6]/30 selection:text-[#2ff0d6]">
+    <div className="relative min-h-screen bg-black text-[#eef1f6] antialiased selection:bg-[#2ff0d6]/30 selection:text-[#2ff0d6]">
+      {/* Living Interactive Particle Field - Spans Entire Landing Page Across All Sections */}
+      <ParticleBackground className="fixed inset-0 pointer-events-none z-0" />
+
       {/* 1. Minimal Header */}
       <nav className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-black/80 backdrop-blur-md px-6 lg:px-12 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -201,96 +205,98 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* 2. Hero Section (Takes Full Viewport Space) */}
-      <section className="relative min-h-[calc(100vh-4rem)] px-6 lg:px-12 max-w-5xl mx-auto flex flex-col items-center justify-between text-center py-12 sm:py-16 lg:py-20">
-        {/* Subtle Ambient Radial Glow Behind Hero */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[450px] pointer-events-none -z-10 blur-3xl opacity-20"
-          style={{
-            background: "radial-gradient(circle, rgba(47,240,214,0.6) 0%, rgba(124,77,255,0.3) 60%, transparent 80%)",
-          }}
-        />
+      {/* Main Content Area */}
+      <main id="main-content" className="relative z-10">
+        {/* 2. Hero Section (Full Viewport Height & Width with Ambient Glow) */}
+        <section className="relative w-full overflow-hidden min-h-[calc(100vh-4rem)] flex flex-col justify-between items-center text-center">
+          {/* Ambient Glow */}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] pointer-events-none z-0 blur-3xl opacity-20"
+            style={{
+              background: "radial-gradient(circle, rgba(47,240,214,0.6) 0%, rgba(124,77,255,0.3) 60%, transparent 80%)",
+            }}
+          />
 
-        {/* Empty placeholder for flex-between balance */}
-        <div className="hidden sm:block h-2" />
+          {/* Empty spacer for flex-between balance */}
+          <div className="relative z-10 hidden sm:block h-2" />
 
-        {/* Center Content Stack */}
-        <div className="flex flex-col items-center max-w-4xl my-auto">
-          {/* Feature Pill */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs text-[#8E97A8] mb-8 backdrop-blur-md">
-            <span className="h-2 w-2 rounded-full bg-[#2ff0d6] animate-pulse" />
-            <span>No Sign-up • Zero Watermarks • 100% Free Forever</span>
-          </div>
-
-          {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white max-w-3xl leading-[1.12]">
-            Data visualization, <br />
-            <span className="bg-gradient-to-r from-[#2ff0d6] via-[#5cf7e4] to-[#9b72ff] bg-clip-text text-transparent">
-              made of living light.
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="mt-5 text-base sm:text-lg text-[#8E97A8] max-w-2xl font-normal leading-relaxed">
-            Transform numbers, spreadsheets, or boring graph screenshots into mesmerizing 60 FPS particle
-            visualizations. Export in 4K Ultra HD and video loops for pitch decks and social media.
-          </p>
-
-          {/* Primary CTA Buttons */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#2ff0d6] px-6 py-3 text-sm font-semibold text-[#06070a] shadow-lg shadow-[#2ff0d6]/25 hover:bg-[#28d7bf] hover:shadow-[#2ff0d6]/35 active:scale-[0.98] transition-all"
-            >
-              <span>Open Studio — Free</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-
-            <a
-              href="https://github.com/aasimsaifi161/charticles"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-medium text-[#cad2e0] hover:text-white hover:bg-white/[0.07] hover:border-white/20 transition-all"
-            >
-              <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                />
-              </svg>
-              <span>Star on GitHub</span>
-            </a>
-          </div>
-
-          {/* Value Micro-Pills */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-[#8E97A8]">
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6]" />
-              <span>120,000 GPU Particles</span>
+          {/* Center Content Stack */}
+          <div className="relative z-10 flex flex-col items-center max-w-4xl px-6 lg:px-12 my-auto">
+            {/* Feature Pill */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs text-[#8E97A8] mb-8 backdrop-blur-md">
+              <span className="h-2 w-2 rounded-full bg-[#2ff0d6] animate-pulse" />
+              <span>No Sign-up • Zero Watermarks • 100% Free Forever</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6]" />
-              <span>AI Vision Ingestion</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6]" />
-              <span>4K Ultra HD & Video Loops</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Scroll Cue Prompt Linking to Interactive Demo Below */}
-        <a
-          href="#demo"
-          className="mt-10 sm:mt-12 inline-flex flex-col items-center gap-2.5 text-xs font-mono text-[#8E97A8]/70 hover:text-[#2ff0d6] transition-colors group cursor-pointer"
-        >
-          <span className="tracking-wide">Explore Interactive Demo</span>
-          <div className="w-5 h-9 rounded-full border border-white/20 group-hover:border-[#2ff0d6]/50 flex items-start justify-center p-1.5 transition-colors">
-            <div className="w-1.5 h-2 rounded-full bg-[#2ff0d6] animate-bounce" />
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white max-w-3xl leading-[1.12]">
+              Data visualization, <br />
+              <span className="bg-gradient-to-r from-[#2ff0d6] via-[#5cf7e4] to-[#9b72ff] bg-clip-text text-transparent">
+                made of living light.
+              </span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="mt-5 text-base sm:text-lg text-[#8E97A8] max-w-2xl font-normal leading-relaxed">
+              Transform numbers, spreadsheets, or boring graph screenshots into mesmerizing 60 FPS particle
+              visualizations. Export in 4K Ultra HD and video loops for pitch decks and social media.
+            </p>
+
+            {/* Primary CTA Buttons */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#2ff0d6] px-6 py-3 text-sm font-semibold text-[#06070a] shadow-lg shadow-[#2ff0d6]/25 hover:bg-[#28d7bf] hover:shadow-[#2ff0d6]/35 active:scale-[0.98] transition-all"
+              >
+                <span>Open Studio — Free</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+
+              <a
+                href="https://github.com/aasimsaifi161/charticles"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-medium text-[#cad2e0] hover:text-white hover:bg-white/[0.07] hover:border-white/20 transition-all"
+              >
+                <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                  />
+                </svg>
+                <span>Star on GitHub</span>
+              </a>
+            </div>
+
+            {/* Value Micro-Pills */}
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-[#8E97A8]">
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6]" />
+                <span>120,000 GPU Particles</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6]" />
+                <span>AI Vision Ingestion</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6]" />
+                <span>4K Ultra HD & Video Loops</span>
+              </div>
+            </div>
           </div>
-        </a>
-      </section>
+
+          {/* Scroll Cue Prompt Linking to Interactive Demo Below */}
+          <a
+            href="#demo"
+            className="relative z-10 mt-10 sm:mt-12 mb-12 inline-flex flex-col items-center gap-2.5 text-xs font-mono text-[#8E97A8]/70 hover:text-[#2ff0d6] transition-colors group cursor-pointer"
+          >
+            <span className="tracking-wide">Explore Interactive Demo</span>
+            <div className="w-5 h-9 rounded-full border border-white/20 group-hover:border-[#2ff0d6]/50 flex items-start justify-center p-1.5 transition-colors">
+              <div className="w-1.5 h-2 rounded-full bg-[#2ff0d6] animate-bounce" />
+            </div>
+          </a>
+        </section>
 
       {/* 3. Live Interactive Sample Showcase Section (Appears When Scrolling Down) */}
       <section id="demo" className="py-24 px-6 lg:px-12 max-w-6xl mx-auto border-t border-white/[0.08]">
@@ -309,7 +315,7 @@ export default function LandingPage() {
         </div>
 
         {/* Live Interactive Hero Canvas Frame (Generous Presentation Scale) */}
-        <div className="w-full max-w-5xl mx-auto rounded-2xl border border-white/10 bg-[#090A0D] p-3 sm:p-5 shadow-2xl overflow-hidden relative group">
+        <div className="w-full max-w-5xl mx-auto rounded-2xl border border-white/10 bg-[#090A0D]/90 backdrop-blur-md p-3 sm:p-5 shadow-2xl overflow-hidden relative group">
           {/* Card Top Control Bar */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] pb-3 mb-3 px-1">
             {/* Chart Title and Live Indicator */}
@@ -384,7 +390,7 @@ export default function LandingPage() {
       <section className="py-16 px-6 lg:px-12 max-w-6xl mx-auto border-t border-white/[0.08]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Feature 1 */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#090A0D] p-6 flex flex-col justify-between">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#090A0D]/85 backdrop-blur-md p-6 flex flex-col justify-between">
             <div>
               <div className="h-10 w-10 rounded-xl bg-[#2ff0d6]/10 border border-[#2ff0d6]/30 flex items-center justify-center text-[#2ff0d6] mb-4">
                 <Upload className="h-5 w-5" />
@@ -401,7 +407,7 @@ export default function LandingPage() {
           </div>
 
           {/* Feature 2 */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#090A0D] p-6 flex flex-col justify-between">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#090A0D]/85 backdrop-blur-md p-6 flex flex-col justify-between">
             <div>
               <div className="h-10 w-10 rounded-xl bg-[#2ff0d6]/10 border border-[#2ff0d6]/30 flex items-center justify-center text-[#2ff0d6] mb-4">
                 <Cpu className="h-5 w-5" />
@@ -418,7 +424,7 @@ export default function LandingPage() {
           </div>
 
           {/* Feature 3 */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#090A0D] p-6 flex flex-col justify-between">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#090A0D]/85 backdrop-blur-md p-6 flex flex-col justify-between">
             <div>
               <div className="h-10 w-10 rounded-xl bg-[#2ff0d6]/10 border border-[#2ff0d6]/30 flex items-center justify-center text-[#2ff0d6] mb-4">
                 <Download className="h-5 w-5" />
@@ -438,7 +444,7 @@ export default function LandingPage() {
 
       {/* 5. Built by the Creator Section */}
       <section className="py-20 px-6 lg:px-12 max-w-4xl mx-auto border-t border-white/[0.08]">
-        <div className="rounded-3xl border border-white/10 bg-[#090A0D] p-8 sm:p-10 relative overflow-hidden shadow-2xl">
+        <div className="rounded-3xl border border-white/10 bg-[#090A0D]/85 backdrop-blur-md p-8 sm:p-10 relative overflow-hidden shadow-2xl">
           {/* Ambient Glow */}
           <div
             className="absolute top-0 right-0 w-80 h-80 pointer-events-none -z-0 blur-3xl opacity-15"
@@ -455,6 +461,10 @@ export default function LandingPage() {
                 <img
                   src="https://github.com/aasimsaifi161.png"
                   alt="Aasim Saifi"
+                  width={80}
+                  height={80}
+                  loading="lazy"
+                  decoding="async"
                   className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover border border-[#2ff0d6]/40 shadow-lg shadow-[#2ff0d6]/10"
                 />
                 <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
@@ -532,7 +542,7 @@ export default function LandingPage() {
 
       {/* 6. Minimal Launch CTA Banner */}
       <section className="py-20 px-6 lg:px-12 max-w-4xl mx-auto text-center">
-        <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-[#0D0F14] to-black p-8 sm:p-12 relative overflow-hidden">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-[#0D0F14]/90 to-black/90 backdrop-blur-md p-8 sm:p-12 relative overflow-hidden">
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Make your data unforgettable.
           </h2>
@@ -552,9 +562,10 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* 7. Minimal Footer */}
-      <footer className="border-t border-white/[0.08] py-8 px-6 lg:px-12 text-xs text-[#8E97A8] flex flex-col sm:flex-row items-center justify-between gap-4 max-w-6xl mx-auto">
+      <footer className="relative z-10 border-t border-white/[0.08] py-8 px-6 lg:px-12 text-xs text-[#8E97A8] flex flex-col sm:flex-row items-center justify-between gap-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
           <CharticlesLogo className="h-4 w-4" />
           <span className="font-semibold text-white">Charticles</span>
