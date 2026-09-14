@@ -74,6 +74,53 @@ Most presentation charts are cold, static, and uninspiring. Pitch decks and keyn
 | **Radar** | Radial Web Geometry | AI benchmark capability matrices, skill distributions |
 | **Scatter & Bubble** | 2D Multi-Axis Fluid Nodes | Correlation analysis, multi-dimensional distributions |
 
+## 💻 Use in Your Own React & Next.js Apps
+
+Charticles is open source. You can drop living 60 FPS particle charts or our interactive particle constellation background directly into any Next.js or React project.
+
+### React / Next.js Component
+
+1. Install the engine:
+```bash
+npm install particle-charts
+```
+
+2. Create a component (e.g. `LivingChart.tsx`):
+```tsx
+"use client";
+
+import { useEffect, useRef } from "react";
+import { ParticleChart } from "particle-charts";
+
+export function LivingChart() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // 120,000 sub-pixel particles simulated on GPU at 60 FPS
+    const chart = ParticleChart(containerRef.current, {
+      type: "bar",
+      background: "#000000",
+      theme: "dark",
+      responsive: true,
+      particle: { color: "#2ff0d6", size: 1.1, bloom: 0.8 },
+      data: {
+        labels: ["Q1", "Q2", "Q3", "Q4"],
+        series: [{ name: "ARR ($M)", values: [12.4, 24.8, 38.2, 55.6] }]
+      }
+    });
+
+    return () => chart.destroy();
+  }, []);
+
+  return <div ref={containerRef} className="w-full h-[500px] rounded-2xl bg-black" />;
+}
+```
+
+> [!TIP]
+> You can visually design, color, and tune your chart in the [Charticles Studio](https://charticles.vercel.app/dashboard), then click **Export → React / Next.js** to copy your exact component code in 1 click.
+
 ---
 
 ## 🚀 Quickstart

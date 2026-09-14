@@ -14,6 +14,10 @@ import {
   Cpu,
   ShieldCheck,
   Coffee,
+  Code2,
+  Copy,
+  Check,
+  Terminal,
 } from "lucide-react";
 import { CharticlesLogo } from "@/components/icons/CharticlesLogo";
 import { ParticleChartStage } from "@/components/ParticleChartStage";
@@ -156,9 +160,64 @@ const HERO_DEMOS: Record<
   },
 };
 
+const REACT_EMBED_SNIPPET = `"use client";
+
+import { useEffect, useRef } from "react";
+import { ParticleChart } from "particle-charts";
+
+export function LivingChart() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // 120,000 sub-pixel GPU particles simulated at 60 FPS
+    const chart = ParticleChart(containerRef.current, {
+      type: "bar",
+      background: "#000000",
+      theme: "dark",
+      responsive: true,
+      particle: { color: "#2ff0d6", size: 1.1, bloom: 0.8 },
+      data: {
+        labels: ["Apple", "NVIDIA", "Microsoft", "Alphabet", "Amazon"],
+        series: [{ name: "Market Cap ($T)", values: [3.45, 3.12, 3.08, 2.15, 1.95] }]
+      }
+    });
+
+    return () => chart.destroy();
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-[500px] rounded-2xl bg-black overflow-hidden border border-white/10"
+    />
+  );
+}
+`;
+
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<"bar" | "line" | "donut" | "radar">("bar");
+  const [hasCopiedEmbed, setHasCopiedEmbed] = useState(false);
+  const [hasCopiedInstall, setHasCopiedInstall] = useState(false);
   const activeDemo = HERO_DEMOS[activeTab];
+
+  const copyEmbedCode = async () => {
+    try {
+      await navigator.clipboard.writeText(REACT_EMBED_SNIPPET);
+      setHasCopiedEmbed(true);
+      trackEvent("embed_code_copied", { format: "react" });
+      setTimeout(() => setHasCopiedEmbed(false), 2000);
+    } catch {}
+  };
+
+  const copyInstallCommand = async () => {
+    try {
+      await navigator.clipboard.writeText("npm install particle-charts");
+      setHasCopiedInstall(true);
+      setTimeout(() => setHasCopiedInstall(false), 2000);
+    } catch {}
+  };
 
   return (
     <div className="relative min-h-screen bg-black text-[#eef1f6] antialiased selection:bg-[#2ff0d6]/30 selection:text-[#2ff0d6]">
@@ -390,7 +449,101 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. Three High-Signal Feature Pillars (No AI Slop) */}
+      {/* 4. Embed in Your Own Website / Developer Component Section */}
+      <section id="embed" className="py-20 px-6 lg:px-12 max-w-5xl mx-auto border-t border-white/[0.08]">
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#2ff0d6]/20 bg-[#2ff0d6]/5 px-3 py-1 text-xs text-[#2ff0d6] mb-3">
+            <Code2 className="h-3.5 w-3.5" />
+            <span>Developer-First & Open Source</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+            Use in Your Own React & Next.js Apps
+          </h2>
+          <p className="mt-3 text-sm sm:text-base text-[#8E97A8]">
+            Drop living 60 FPS particle charts directly into any Next.js or React codebase with zero config.
+          </p>
+        </div>
+
+        {/* Component Code Viewer Box */}
+        <div className="w-full rounded-2xl border border-white/10 bg-[#090A0D]/90 backdrop-blur-md p-4 sm:p-6 shadow-2xl overflow-hidden">
+          {/* Top Bar: Component Title & Install Pill */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4 mb-4">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#2ff0d6]" />
+              <span className="text-xs font-semibold text-white tracking-tight">
+                LivingChart.tsx (React Component)
+              </span>
+              <span className="rounded-full bg-white/[0.06] border border-white/10 px-2 py-0.5 text-[10px] font-mono text-[#8E97A8]">
+                React 18 & 19
+              </span>
+            </div>
+
+            {/* Install Pill */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/70 border border-white/10 text-xs font-mono text-[#8E97A8]">
+              <Terminal className="h-3 w-3 text-[#2ff0d6]" />
+              <span className="text-white select-all">npm i particle-charts</span>
+              <button
+                type="button"
+                onClick={copyInstallCommand}
+                className="text-[#8E97A8] hover:text-[#2ff0d6] p-0.5 rounded transition-colors cursor-pointer"
+                title="Copy install command"
+              >
+                {hasCopiedInstall ? (
+                  <Check className="h-3.5 w-3.5 text-[#2ff0d6]" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Code Snippet Container */}
+          <div className="relative rounded-xl border border-white/10 bg-black/80 p-4 font-mono text-xs leading-relaxed text-[#cad2e0] overflow-hidden">
+            {/* File Label & Copy Action */}
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.06] text-[11px] text-[#8E97A8]">
+              <span className="font-mono text-[#2ff0d6]">LivingChart.tsx</span>
+
+              <button
+                type="button"
+                onClick={copyEmbedCode}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] hover:bg-white/10 px-3 py-1 text-xs text-white border border-white/10 transition-all cursor-pointer"
+              >
+                {hasCopiedEmbed ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-[#2ff0d6]" />
+                    <span className="text-[#2ff0d6] font-medium">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5 text-[#8E97A8]" />
+                    <span>Copy Component</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Code Body */}
+            <pre className="max-h-72 overflow-y-auto overflow-x-auto text-[11px] sm:text-xs leading-relaxed scrollbar-thin scrollbar-thumb-white/10">
+              <code>{REACT_EMBED_SNIPPET}</code>
+            </pre>
+          </div>
+
+          {/* Bottom Bar: Jump into Studio link */}
+          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#8E97A8]">
+            <span>Need custom data or colors? Configure visually in Studio and export code in 1 click.</span>
+            <Link
+              href="/dashboard"
+              className="text-[#2ff0d6] hover:underline inline-flex items-center gap-1 font-medium shrink-0"
+            >
+              <span>Open Studio Code Exporter</span>
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Three High-Signal Feature Pillars (No AI Slop) */}
       <section className="py-16 px-6 lg:px-12 max-w-6xl mx-auto border-t border-white/[0.08]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Feature 1 */}

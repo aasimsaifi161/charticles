@@ -8,12 +8,17 @@ import {
   Video,
   Loader2,
   Coffee,
+  Code2,
+  Copy,
+  Check,
+  Terminal,
 } from "lucide-react";
 import { CharticlesLogo } from "@/components/icons/CharticlesLogo";
 import {
   exportChartPng,
   recordCanvasVideo,
 } from "@/lib/export-engine";
+import { generateReactComponent } from "@/lib/code-generator";
 import { trackEvent } from "@/lib/analytics";
 import type { ChartOptions } from "particle-charts";
 
@@ -30,8 +35,11 @@ export function ExportStudioModal({
   onClose,
   datasetName,
   activeChartType,
+  chartConfig,
 }: ExportStudioModalProps) {
-  const [activeTab, setActiveTab] = useState<"image" | "video">("image");
+  const [activeTab, setActiveTab] = useState<"image" | "video" | "code">("image");
+  const [hasCopied, setHasCopied] = useState(false);
+  const [hasCopiedInstall, setHasCopiedInstall] = useState(false);
 
   // Image Export Settings
   const [resolution, setResolution] = useState<"1x" | "2x" | "4k">("2x");
@@ -141,10 +149,50 @@ export function ExportStudioModal({
     }
   };
 
+  const getGeneratedSnippet = () => {
+    if (!chartConfig) return "// Configure your chart in the studio to generate code";
+    const sanitizedName =
+      (datasetName || "Chart")
+        .replace(/[^a-zA-Z0-9]/g, " ")
+        .split(" ")
+        .filter(Boolean)
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join("") || "LivingParticleChart";
+    return generateReactComponent(
+      chartConfig,
+      sanitizedName.endsWith("Chart") ? sanitizedName : `${sanitizedName}Chart`
+    );
+  };
+
+  const handleCopyCode = async () => {
+    try {
+      const snippet = getGeneratedSnippet();
+      await navigator.clipboard.writeText(snippet);
+      setHasCopied(true);
+      trackEvent("chart_exported", {
+        format: "react_component",
+        chartType: activeChartType,
+      });
+      setTimeout(() => setHasCopied(false), 2200);
+    } catch (err) {
+      console.error("Failed to copy snippet:", err);
+    }
+  };
+
+  const handleCopyInstall = async () => {
+    try {
+      await navigator.clipboard.writeText("npm install particle-charts");
+      setHasCopiedInstall(true);
+      setTimeout(() => setHasCopiedInstall(false), 2000);
+    } catch {}
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
       <div
-        className="relative w-full max-w-md bg-[#090A0D] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        className={`relative w-full ${
+          activeTab === "code" ? "max-w-lg" : "max-w-md"
+        } bg-[#090A0D] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-150`}
         style={{
           boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(47, 240, 214, 0.08)",
         }}
@@ -177,7 +225,7 @@ export function ExportStudioModal({
 
         {/* Format Selector Tabs */}
         <div className="p-2 border-b border-white/[0.06] bg-[#0A0B0E]">
-          <div className="grid grid-cols-2 gap-1 bg-black/60 p-1 rounded-xl border border-white/[0.08]">
+          <div className="grid grid-cols-3 gap-1 bg-black/60 p-1 rounded-xl border border-white/[0.08]">
             <button
               type="button"
               onClick={() => setActiveTab("image")}
@@ -188,7 +236,7 @@ export function ExportStudioModal({
               }`}
             >
               <ImageIcon className="h-3.5 w-3.5" />
-              <span>Image (PNG)</span>
+              <span>Image</span>
             </button>
 
             <button
@@ -201,7 +249,20 @@ export function ExportStudioModal({
               }`}
             >
               <Video className="h-3.5 w-3.5" />
-              <span>60 FPS Video</span>
+              <span>Video</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("code")}
+              className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                activeTab === "code"
+                  ? "bg-[#2ff0d6] text-[#06070a] font-semibold shadow-sm shadow-[#2ff0d6]/20"
+                  : "text-[#8E97A8] hover:text-white"
+              }`}
+            >
+              <Code2 className="h-3.5 w-3.5" />
+              <span>React / Next.js</span>
             </button>
           </div>
         </div>
@@ -228,7 +289,7 @@ export function ExportStudioModal({
                       onClick={() => setResolution(res.id)}
                       className={`py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                         resolution === res.id
-                          ? "bg-white/15 text-white font-semibold shadow-sm border border-white/20"
+                          ? "bg-[#2ff0d6] text-[#06070a] font-semibold shadow-sm"
                           : "text-[#8E97A8] hover:text-white"
                       }`}
                     >
@@ -239,27 +300,35 @@ export function ExportStudioModal({
               </div>
 
               {/* Toggles */}
-              <div className="space-y-2 pt-1">
-                <label className="flex items-center justify-between p-2.5 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-colors">
-                  <span className="text-xs text-[#eef1f6]">Include Studio Frame Card</span>
+              <div className="space-y-2 pt-1 border-t border-white/[0.06]">
+                <label className="flex items-center justify-between text-xs text-[#8E97A8] cursor-pointer hover:text-white py-1">
+                  <span>Studio Presentation Frame</span>
                   <input
                     type="checkbox"
                     checked={studioFrame}
                     onChange={(e) => setStudioFrame(e.target.checked)}
-                    className="h-4 w-4 rounded bg-white/10 border-white/20 text-[#2ff0d6] accent-[#2ff0d6] cursor-pointer"
+                    className="rounded border-white/20 bg-black accent-[#2ff0d6] h-4 w-4 cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-2.5 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-colors">
-                  <span className="text-xs text-[#eef1f6]">Transparent Background</span>
+                <label className="flex items-center justify-between text-xs text-[#8E97A8] cursor-pointer hover:text-white py-1">
+                  <span>Transparent Background</span>
                   <input
                     type="checkbox"
                     checked={transparent}
                     onChange={(e) => setTransparent(e.target.checked)}
-                    className="h-4 w-4 rounded bg-white/10 border-white/20 text-[#2ff0d6] accent-[#2ff0d6] cursor-pointer"
+                    className="rounded border-white/20 bg-black accent-[#2ff0d6] h-4 w-4 cursor-pointer"
                   />
                 </label>
               </div>
+
+              {/* Status or Progress Feedback */}
+              {statusMessage && (
+                <div className="flex items-center gap-2 text-xs font-mono text-[#2ff0d6] bg-[#2ff0d6]/10 p-2.5 rounded-xl border border-[#2ff0d6]/20 animate-pulse">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>{statusMessage}</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -268,10 +337,11 @@ export function ExportStudioModal({
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-white">Loop Duration</label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {[
-                    { sec: 4, label: "4-Second Loop" },
-                    { sec: 6, label: "6-Second Loop" },
+                    { sec: 3, label: "3 Seconds" },
+                    { sec: 4, label: "4 Seconds" },
+                    { sec: 6, label: "6 Seconds" },
                   ].map((dur) => (
                     <button
                       key={dur.sec}
@@ -311,6 +381,64 @@ export function ExportStudioModal({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB 3: REACT / NEXT.JS COMPONENT */}
+          {activeTab === "code" && (
+            <div className="space-y-3.5">
+              {/* Header Label */}
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-white">React / Next.js Component</label>
+                <span className="text-[10px] text-[#2ff0d6] font-mono">React 18 & 19 • Next.js 14+</span>
+              </div>
+
+              {/* Install Command Pill */}
+              <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-black/70 border border-white/10 text-xs font-mono text-[#8E97A8]">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <Terminal className="h-3.5 w-3.5 text-[#2ff0d6] shrink-0" />
+                  <span className="truncate text-white select-all">npm install particle-charts</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyInstall}
+                  className="shrink-0 text-[#8E97A8] hover:text-[#2ff0d6] p-1 rounded transition-colors cursor-pointer"
+                  title="Copy install command"
+                >
+                  {hasCopiedInstall ? (
+                    <Check className="h-3.5 w-3.5 text-[#2ff0d6]" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
+
+              {/* Code Preview Box */}
+              <div className="relative rounded-xl border border-white/10 bg-black/80 p-3 font-mono text-[11px] leading-relaxed text-[#cad2e0] overflow-hidden">
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.06] text-[10px] text-[#8E97A8]">
+                  <span className="font-mono text-[#2ff0d6]">LivingParticleChart.tsx</span>
+                  <button
+                    type="button"
+                    onClick={handleCopyCode}
+                    className="inline-flex items-center gap-1 text-[#2ff0d6] hover:underline cursor-pointer"
+                  >
+                    {hasCopied ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3" />
+                        <span>Copy snippet</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <pre className="max-h-52 overflow-y-auto overflow-x-auto text-[10.5px] leading-relaxed scrollbar-thin scrollbar-thumb-white/10">
+                  <code>{getGeneratedSnippet()}</code>
+                </pre>
+              </div>
             </div>
           )}
         </div>
@@ -370,6 +498,26 @@ export function ExportStudioModal({
                 <Video className="h-3.5 w-3.5" />
               )}
               <span>{isProcessing ? "Recording..." : `Record Video Loop`}</span>
+            </button>
+          )}
+
+          {activeTab === "code" && (
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#2ff0d6] hover:bg-[#28d7bf] px-4 py-2 text-xs font-semibold text-[#06070a] shadow-md shadow-[#2ff0d6]/25 active:scale-[0.98] transition-all cursor-pointer"
+            >
+              {hasCopied ? (
+                <>
+                  <Check className="h-3.5 w-3.5" />
+                  <span>Copied to Clipboard!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5" />
+                  <span>Copy React Component</span>
+                </>
+              )}
             </button>
           )}
         </div>
