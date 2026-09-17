@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://charticles.vercel.app"),
   title: "Charticles — Free 60 FPS Particle Chart Studio",
   description:
-    "Turn any data or chart image into mesmerizing, living particle visualizations. Export Ultra HD PNGs and 60 FPS video loops for pitch decks and social media. 100% free, zero watermarks.",
+    "Turn any data or chart image into mesmerizing 60 FPS particle visualizations. 100% free, zero watermarks, 4K Ultra HD export.",
   keywords: [
     "particle charts",
     "data visualization",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     url: "https://charticles.vercel.app",
     title: "Charticles — Free 60 FPS Particle Chart Studio",
     description:
-      "Turn any data or chart image into mesmerizing, living particle visualizations. 100% free, zero watermarks.",
+      "Turn any data or chart image into mesmerizing 60 FPS particle visualizations. 100% free, zero watermarks, 4K Ultra HD export.",
     siteName: "Charticles",
     images: [
       {
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Charticles — Free 60 FPS Particle Chart Studio",
     description:
-      "Turn any data or chart image into mesmerizing, living particle visualizations. 100% free, zero watermarks.",
+      "Turn any data or chart image into mesmerizing 60 FPS particle visualizations. 100% free, zero watermarks, 4K Ultra HD export.",
     creator: "@aasimtwt",
     images: ["/og-image.png"],
   },

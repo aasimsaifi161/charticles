@@ -17,6 +17,7 @@ import {
   Maximize2,
   Minimize2,
   Pencil,
+  SlidersHorizontal,
 } from "lucide-react";
 import type { ChartTabKey } from "@/types/chart";
 import {
@@ -65,6 +66,7 @@ const EMPTY_TABULAR_DATA: TabularData = {
 };
 
 export default function DashboardPage() {
+  const [mobileTab, setMobileTab] = useState<"stage" | "data" | "tune">("stage");
   const [dataStudioTab, setDataStudioTab] = useState<DataStudioTab>("table");
   const [datasetName, setDatasetName] = useState<string>("Custom Data");
   const [tabularData, setTabularData] = useState<TabularData>(EMPTY_TABULAR_DATA);
@@ -369,6 +371,7 @@ export default function DashboardPage() {
       setActiveChartType("bar-dual");
     }
     setDataStudioTab("table");
+    setMobileTab("stage");
   };
 
   const handleImageExtracted = (extracted: ExtractedChartData) => {
@@ -376,6 +379,7 @@ export default function DashboardPage() {
     setDatasetName(extracted.datasetName);
     setActiveChartType(extracted.chartType);
     setDataStudioTab("table");
+    setMobileTab("stage");
   };
 
   const handleClear = () => {
@@ -393,6 +397,7 @@ export default function DashboardPage() {
     setDatasetName(preset.name);
     setTabularData(preset.data);
     setActiveChartType(preset.chartType);
+    setMobileTab("stage");
   };
 
   return (
@@ -410,17 +415,23 @@ export default function DashboardPage() {
         onSelectPreset={handleSelectPreset}
       />
 
-      {/* Main 3-Column Studio Workspace */}
-      <div className="flex-1 flex min-h-0 overflow-hidden">
+      {/* Main 3-Column Studio Workspace (Responsive) */}
+      <div className="flex-1 flex min-h-0 overflow-hidden relative">
         {/* Left Sidebar: Data Studio (Layers / Assets style) */}
-        <aside className="w-80 shrink-0 border-r border-white/[0.08] bg-[#09090B] flex flex-col min-h-0 z-20">
+        <aside
+          className={`border-r border-white/[0.08] bg-[#09090B] flex flex-col min-h-0 z-20 ${
+            mobileTab === "data"
+              ? "w-full flex-1 flex"
+              : "hidden lg:flex lg:w-80 lg:shrink-0"
+          }`}
+        >
           {/* Data Studio Header & Mode Tabs */}
           <div className="h-11 shrink-0 px-3 flex items-center justify-between border-b border-white/[0.08] bg-[#09090B]">
             <div className="flex items-center gap-1 bg-black/50 p-0.5 rounded-lg border border-white/[0.08] w-full">
               <button
                 type="button"
                 onClick={() => setDataStudioTab("table")}
-                className={`flex-1 inline-flex items-center justify-center gap-1 py-1 text-[11px] font-medium rounded-md transition-all ${
+                className={`flex-1 inline-flex items-center justify-center gap-1 py-1 text-[11px] font-medium rounded-md transition-all cursor-pointer ${
                   dataStudioTab === "table"
                     ? "bg-[#2ff0d6] text-[#06070a] font-semibold shadow-sm shadow-[#2ff0d6]/20"
                     : "text-[#8E97A8] hover:text-white"
@@ -432,7 +443,7 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setDataStudioTab("upload")}
-                className={`flex-1 inline-flex items-center justify-center gap-1 py-1 text-[11px] font-medium rounded-md transition-all ${
+                className={`flex-1 inline-flex items-center justify-center gap-1 py-1 text-[11px] font-medium rounded-md transition-all cursor-pointer ${
                   dataStudioTab === "upload"
                     ? "bg-[#2ff0d6] text-[#06070a] font-semibold shadow-sm shadow-[#2ff0d6]/20"
                     : "text-[#8E97A8] hover:text-white"
@@ -444,7 +455,7 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setDataStudioTab("image")}
-                className={`flex-1 inline-flex items-center justify-center gap-1 py-1 text-[11px] font-medium rounded-md transition-all ${
+                className={`flex-1 inline-flex items-center justify-center gap-1 py-1 text-[11px] font-medium rounded-md transition-all cursor-pointer ${
                   dataStudioTab === "image"
                     ? "bg-[#2ff0d6] text-[#06070a] font-semibold shadow-sm shadow-[#2ff0d6]/20"
                     : "text-[#8E97A8] hover:text-white"
@@ -494,8 +505,12 @@ export default function DashboardPage() {
         {/* Center Viewport: The Hero Particle Stage */}
         <main
           ref={stageContainerRef}
-          className={`flex-1 relative bg-black flex flex-col min-w-0 min-h-0 overflow-hidden ${
-            isFullscreen ? "fixed inset-0 z-50" : ""
+          className={`relative bg-black flex flex-col min-w-0 min-h-0 overflow-hidden ${
+            isFullscreen
+              ? "fixed inset-0 z-50"
+              : mobileTab === "stage"
+              ? "flex-1 w-full flex"
+              : "hidden lg:flex lg:flex-1"
           }`}
         >
           {/* Subtle Ambient Glow */}
@@ -508,7 +523,7 @@ export default function DashboardPage() {
           />
 
           {/* Floating Graph Title: Centered at Top Middle & Small */}
-          <div className="absolute top-3.5 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center max-w-[80%] select-none">
+          <div className="absolute top-3 sm:top-3.5 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center max-w-[50%] sm:max-w-[70%] select-none">
             {isEditingTitle ? (
               <div className="flex items-center gap-2 bg-black/90 border border-[#2ff0d6]/60 rounded-full px-3 py-1 backdrop-blur-md shadow-lg shadow-[#2ff0d6]/10">
                 <Sparkles className="h-3 w-3 text-[#2ff0d6] shrink-0 animate-pulse" />
@@ -525,7 +540,7 @@ export default function DashboardPage() {
                       setIsEditingTitle(false);
                     }
                   }}
-                  className="bg-transparent text-xs font-medium text-white outline-none w-40 sm:w-56 text-center placeholder-[#555E6D]"
+                  className="bg-transparent text-xs font-medium text-white outline-none w-32 sm:w-56 text-center placeholder-[#555E6D]"
                   placeholder="Name this graph..."
                 />
               </div>
@@ -533,11 +548,11 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setIsEditingTitle(true)}
-                className="group flex items-center gap-1.5 bg-black/60 hover:bg-black/85 border border-white/10 hover:border-[#2ff0d6]/40 rounded-full px-3 py-1 backdrop-blur-md transition-all cursor-pointer shadow-md text-center"
+                className="group flex items-center gap-1.5 bg-black/60 hover:bg-black/85 border border-white/10 hover:border-[#2ff0d6]/40 rounded-full px-2.5 sm:px-3 py-1 backdrop-blur-md transition-all cursor-pointer shadow-md text-center max-w-full"
                 title="Click to rename graph"
               >
                 <div className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6] shadow-sm shadow-[#2ff0d6]/50 animate-pulse shrink-0" />
-                <span className="text-xs font-medium text-white/90 group-hover:text-[#2ff0d6] transition-colors truncate max-w-[180px] sm:max-w-[300px]">
+                <span className="text-xs font-medium text-white/90 group-hover:text-[#2ff0d6] transition-colors truncate">
                   {datasetName}
                 </span>
                 <Pencil className="h-2.5 w-2.5 text-[#8E97A8] opacity-0 group-hover:opacity-100 group-hover:text-[#2ff0d6] transition-all ml-0.5 shrink-0" />
@@ -546,12 +561,12 @@ export default function DashboardPage() {
           </div>
 
           {/* Floating Canvas Controls: Area Fill & Fullscreen */}
-          <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
+          <div className="absolute top-3 sm:top-4 right-3 sm:right-4 z-30 flex items-center gap-1.5 sm:gap-2">
             {activeChartType === "line-area" && (
               <button
                 type="button"
                 onClick={() => setIsAreaFill(!isAreaFill)}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-mono font-medium transition-all border shadow-lg backdrop-blur-md cursor-pointer ${
+                className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-mono font-medium transition-all border shadow-lg backdrop-blur-md cursor-pointer ${
                   isAreaFill
                     ? "border-[#2ff0d6]/50 bg-[#2ff0d6]/15 text-[#2ff0d6]"
                     : "border-white/10 bg-black/60 text-[#8E97A8] hover:text-white"
@@ -565,7 +580,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={toggleFullscreen}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-black/60 px-2.5 py-1 text-xs font-medium text-[#8E97A8] hover:text-white hover:border-[#2ff0d6]/40 hover:bg-black/80 transition-all shadow-lg backdrop-blur-md cursor-pointer"
+              className="inline-flex items-center gap-1 sm:gap-1.5 rounded-lg border border-white/10 bg-black/60 px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-medium text-[#8E97A8] hover:text-white hover:border-[#2ff0d6]/40 hover:bg-black/80 transition-all shadow-lg backdrop-blur-md cursor-pointer"
               title={
                 isFullscreen
                   ? "Exit Fullscreen (ESC)"
@@ -575,19 +590,19 @@ export default function DashboardPage() {
               {isFullscreen ? (
                 <>
                   <Minimize2 className="h-3.5 w-3.5 text-[#2ff0d6]" />
-                  <span className="font-mono text-[11px]">Exit (ESC)</span>
+                  <span className="font-mono text-[11px] hidden sm:inline">Exit</span>
                 </>
               ) : (
                 <>
                   <Maximize2 className="h-3.5 w-3.5 text-[#2ff0d6]" />
-                  <span className="font-mono text-[11px]">Fullscreen</span>
+                  <span className="font-mono text-[11px] hidden sm:inline">Fullscreen</span>
                 </>
               )}
             </button>
           </div>
 
           {/* Main Stage: Canvas or Empty Viewport */}
-          <div className="flex-1 w-full h-full relative flex items-center justify-center p-6 lg:p-10">
+          <div className="flex-1 w-full h-full relative flex items-center justify-center p-2 sm:p-6 lg:p-10">
             {hasValidData ? (
               <ParticleChartStage
                 config={chartConfig}
@@ -598,7 +613,7 @@ export default function DashboardPage() {
                 isCompensated={isFullscreen && knobs.fullscreenScale}
               />
             ) : (
-              <div className="flex flex-col items-center justify-center border border-dashed border-white/10 rounded-2xl p-10 text-center max-w-md bg-white/[0.01]">
+              <div className="flex flex-col items-center justify-center border border-dashed border-white/10 rounded-2xl p-6 sm:p-10 text-center max-w-md bg-white/[0.01] m-4">
                 <div className="h-12 w-12 rounded-full border border-[#2ff0d6]/30 bg-[#2ff0d6]/10 flex items-center justify-center text-[#2ff0d6] mb-3 shadow-sm shadow-[#2ff0d6]/20">
                   <Sparkles className="h-6 w-6 text-[#2ff0d6] animate-pulse" />
                 </div>
@@ -607,21 +622,21 @@ export default function DashboardPage() {
                 </h3>
                 <p className="text-xs text-[#8E97A8] leading-relaxed">
                   {isDualSeries
-                    ? "Enter categories and numeric values for Series 1 and Series 2 in the Data Studio on the left to generate comparative particles."
-                    : "Enter category labels and numbers in the Data Studio on the left, or drop a CSV file to generate living particles."}
+                    ? "Enter categories and numeric values for Series 1 and Series 2 in the Data Studio to generate comparative particles."
+                    : "Enter category labels and numbers in the Data Studio, or drop a CSV file to generate living particles."}
                 </p>
               </div>
             )}
           </div>
 
           {/* Figma-style Bottom Canvas Status Bar */}
-          <div className="h-8 shrink-0 border-t border-white/[0.08] bg-[#09090B] px-4 flex items-center justify-between text-[11px] text-[#8E97A8] font-mono z-20 select-none">
-            <div className="flex items-center gap-4">
+          <div className="h-8 shrink-0 border-t border-white/[0.08] bg-[#09090B] px-3 sm:px-4 flex items-center justify-between text-[10px] sm:text-[11px] text-[#8E97A8] font-mono z-20 select-none overflow-x-auto whitespace-nowrap">
+            <div className="flex items-center gap-3 sm:gap-4">
               <span className="flex items-center gap-1.5 text-white">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#2ff0d6]" />
                 {activeChartType.toUpperCase()}
               </span>
-              <span>
+              <span className="hidden xs:inline">
                 Palette:{" "}
                 {activeChartType === "bar-dual" ? (
                   <span className="text-white">
@@ -633,19 +648,19 @@ export default function DashboardPage() {
               </span>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               {isFullscreen && (
                 <span className="inline-flex items-center gap-1 text-[#2ff0d6]">
                   <Sparkles className="h-3 w-3 animate-pulse" />
                   <span>
                     {knobs.fullscreenScale
-                      ? "Adaptive Fullscreen (1.85× Active)"
+                      ? "Adaptive Fullscreen"
                       : "Fullscreen"}
                   </span>
                 </span>
               )}
               <span>
-                Active Rows:{" "}
+                Rows:{" "}
                 {
                   tabularData.rows.filter((r) => {
                     const v1 = typeof r[1] === "number" && Number.isFinite(r[1]);
@@ -656,7 +671,7 @@ export default function DashboardPage() {
               </span>
               {particleCount !== null && (
                 <span className="text-[#2ff0d6]">
-                  ~{particleCount.toLocaleString()} Particles
+                  ~{particleCount.toLocaleString()}
                 </span>
               )}
             </div>
@@ -664,7 +679,13 @@ export default function DashboardPage() {
         </main>
 
         {/* Right Sidebar: Figma Inspector / Tuning Knobs */}
-        <aside className="w-72 shrink-0 border-l border-white/[0.08] bg-[#09090B] flex flex-col min-h-0 z-20">
+        <aside
+          className={`border-l border-white/[0.08] bg-[#09090B] flex flex-col min-h-0 z-20 ${
+            mobileTab === "tune"
+              ? "w-full flex-1 flex"
+              : "hidden lg:flex lg:w-72 lg:shrink-0"
+          }`}
+        >
           <PlaygroundKnobs
             state={knobs}
             onChange={(updated) =>
@@ -673,6 +694,72 @@ export default function DashboardPage() {
           />
         </aside>
       </div>
+
+      {/* Mobile Bottom Navigation Dock (Visible only on < lg screens) */}
+      <nav className="lg:hidden shrink-0 h-14 bg-[#09090B] border-t border-white/[0.08] px-3 flex items-center justify-around z-30 select-none">
+        <button
+          type="button"
+          onClick={() => setMobileTab("stage")}
+          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-4 rounded-xl text-[10px] font-medium transition-all cursor-pointer ${
+            mobileTab === "stage"
+              ? "text-[#2ff0d6] font-semibold"
+              : "text-[#8E97A8] hover:text-white"
+          }`}
+        >
+          <div
+            className={`p-1.5 rounded-lg transition-all ${
+              mobileTab === "stage"
+                ? "bg-[#2ff0d6]/15 border border-[#2ff0d6]/30 text-[#2ff0d6]"
+                : ""
+            }`}
+          >
+            <BarChart3 className="h-4 w-4" />
+          </div>
+          <span>Chart</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileTab("data")}
+          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-4 rounded-xl text-[10px] font-medium transition-all cursor-pointer ${
+            mobileTab === "data"
+              ? "text-[#2ff0d6] font-semibold"
+              : "text-[#8E97A8] hover:text-white"
+          }`}
+        >
+          <div
+            className={`p-1.5 rounded-lg transition-all ${
+              mobileTab === "data"
+                ? "bg-[#2ff0d6]/15 border border-[#2ff0d6]/30 text-[#2ff0d6]"
+                : ""
+            }`}
+          >
+            <Table className="h-4 w-4" />
+          </div>
+          <span>Data</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileTab("tune")}
+          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-4 rounded-xl text-[10px] font-medium transition-all cursor-pointer ${
+            mobileTab === "tune"
+              ? "text-[#2ff0d6] font-semibold"
+              : "text-[#8E97A8] hover:text-white"
+          }`}
+        >
+          <div
+            className={`p-1.5 rounded-lg transition-all ${
+              mobileTab === "tune"
+                ? "bg-[#2ff0d6]/15 border border-[#2ff0d6]/30 text-[#2ff0d6]"
+                : ""
+            }`}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+          </div>
+          <span>Physics</span>
+        </button>
+      </nav>
 
       {/* Canva-Style Export Studio Modal */}
       <ExportStudioModal
