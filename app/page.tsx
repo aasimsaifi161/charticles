@@ -268,16 +268,8 @@ export default function LandingPage() {
 
       {/* Main Content Area */}
       <main id="main-content" className="relative z-10">
-        {/* 2. Hero Section (Full Viewport Height & Width with Ambient Glow) */}
+        {/* 2. Hero Section (Full Viewport Height & Width) */}
         <section className="relative w-full overflow-hidden min-h-[calc(100vh-4rem)] flex flex-col justify-between items-center text-center">
-          {/* Ambient Glow */}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] pointer-events-none z-0 blur-3xl opacity-20"
-            style={{
-              background: "radial-gradient(circle, rgba(47,240,214,0.6) 0%, rgba(124,77,255,0.3) 60%, transparent 80%)",
-            }}
-          />
-
           {/* Empty spacer for flex-between balance */}
           <div className="relative z-10 hidden sm:block h-2" />
 

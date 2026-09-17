@@ -56,10 +56,11 @@ export const metadata: Metadata = {
     siteName: "Charticles",
     images: [
       {
-        url: "/icon.svg",
-        width: 512,
-        height: 512,
-        alt: "Charticles Logo",
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Charticles — Free 60 FPS Particle Chart Studio",
+        type: "image/png",
       },
     ],
   },
@@ -69,7 +70,7 @@ export const metadata: Metadata = {
     description:
       "Turn any data or chart image into mesmerizing, living particle visualizations. 100% free, zero watermarks.",
     creator: "@aasimtwt",
-    images: ["/icon.svg"],
+    images: ["/og-image.png"],
   },
   icons: {
     icon: "/icon.svg",
